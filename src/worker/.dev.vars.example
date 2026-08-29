@@ -1,0 +1,3 @@
+# The Client ID and Client Secret for the Modrinth Application
+CLIENT_ID = ""
+CLIENT_SECRET = ""
