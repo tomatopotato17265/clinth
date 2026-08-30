@@ -62,3 +62,15 @@ pub(crate) fn underline(text: &str) -> String {
         text.to_string()
     }
 }
+
+pub(crate) fn hit_line(hit: &modrinth::SearchHit) -> String {
+    format!(
+        "{} by {} - {}",
+        bold(&hit.title),
+        bold(&hit.author),
+        underline(&format!(
+            "https://modrinth.com/{}/{}",
+            hit.project_type, hit.slug
+        ))
+    )
+}

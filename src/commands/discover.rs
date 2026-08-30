@@ -33,15 +33,7 @@ pub fn run(content_type: ContentType, query: &[String]) -> Result<()> {
         return Ok(());
     }
     for hit in hits {
-        println!(
-            "{} by {} - {}",
-            crate::bold(&hit.title),
-            crate::bold(&hit.author),
-            crate::underline(&format!(
-                "https://modrinth.com/{}/{}",
-                hit.project_type, hit.slug
-            ))
-        );
+        println!("{}", crate::hit_line(&hit));
     }
     Ok(())
 }
