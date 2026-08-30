@@ -1,27 +1,17 @@
-use std::io::IsTerminal;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, anyhow, bail};
-use keyring::Entry;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use tiny_http::{Header, Request, Response, Server};
+
+use crate::auth::{self, TokenRecord};
 
 const CLIENT_ID: &str = "Lg8hvjeB";
 const WORKER_TOKEN_URL: &str = "https://clinth.tomatopotato17265.workers.dev/token";
 const REDIRECT_PORT: u16 = 7113;
 const REDIRECT_URI: &str = "http://localhost:7113/callback";
 const AUTHORIZE_URL: &str = "https://modrinth.com/auth/authorize";
-const API_BASE: &str = "https://api.modrinth.com";
 const SCOPES: &str = "USER_READ";
-
-const USER_AGENT: &str = concat!(
-    "clinth/",
-    env!("CARGO_PKG_VERSION"),
-    " (+https://github.com/tomatopotato17265/clinth)"
-);
-
-const KEYRING_SERVICE: &str = "clinth";
-const KEYRING_ACCOUNT: &str = "modrinth";
 
 pub fn run() -> Result<()> {
     let state = random_state()?;
@@ -33,16 +23,16 @@ pub fn run() -> Result<()> {
 
     let code = wait_for_code(&state)?;
     let token = exchange_code(&code)?;
-    let username = fetch_username(&token.access_token)?;
+    let username = auth::fetch_username(&token.access_token)?;
 
-    save_token(&TokenRecord {
+    auth::save(&TokenRecord {
         access_token: token.access_token,
         token_type: token.token_type,
         expires_at: now_unix().saturating_add(token.expires_in),
         username: username.clone(),
     })?;
 
-    println!("{}", bold(&format!("Logged in as {username}.")));
+    println!("{}", crate::bold(&format!("Logged in as {username}.")));
     Ok(())
 }
 
@@ -164,53 +154,6 @@ fn exchange_code(code: &str) -> Result<TokenResponse> {
         bail!("token exchange failed ({status}): {body}");
     }
     serde_json::from_str(&body).with_context(|| format!("unexpected token response: {body}"))
-}
-
-#[derive(Debug, Deserialize)]
-struct User {
-    username: String,
-}
-
-fn fetch_username(access_token: &str) -> Result<String> {
-    let resp = reqwest::blocking::Client::new()
-        .get(format!("{API_BASE}/v2/user"))
-        .header("Authorization", access_token)
-        .header("User-Agent", USER_AGENT)
-        .send()
-        .context("failed to reach the Modrinth API")?;
-
-    let status = resp.status();
-    let body = resp.text().unwrap_or_default();
-    if !status.is_success() {
-        bail!("could not fetch your Modrinth profile ({status}): {body}");
-    }
-    let user: User = serde_json::from_str(&body)
-        .with_context(|| format!("unexpected /v2/user response: {body}"))?;
-    Ok(user.username)
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct TokenRecord {
-    access_token: String,
-    token_type: String,
-    expires_at: u64,
-    username: String,
-}
-
-fn save_token(record: &TokenRecord) -> Result<()> {
-    let json = serde_json::to_string(record)?;
-    Entry::new(KEYRING_SERVICE, KEYRING_ACCOUNT)
-        .context("failed to open the OS keyring")?
-        .set_password(&json)
-        .context("failed to write the credential to the OS keyring")
-}
-
-fn bold(text: &str) -> String {
-    if std::io::stdout().is_terminal() {
-        format!("\x1b[1m{text}\x1b[0m")
-    } else {
-        text.to_string()
-    }
 }
 
 fn now_unix() -> u64 {
