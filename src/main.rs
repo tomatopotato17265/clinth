@@ -2,6 +2,7 @@ mod auth;
 
 mod commands {
     pub mod login;
+    pub mod logout;
     pub mod whoami;
 }
 
@@ -23,12 +24,15 @@ enum Commands {
     Login,
     #[command(disable_help_flag = true)]
     Whoami,
+    #[command(disable_help_flag = true)]
+    Logout,
 }
 
 fn main() -> Result<()> {
     match Cli::parse().command {
         Commands::Login => commands::login::run(),
         Commands::Whoami => commands::whoami::run(),
+        Commands::Logout => commands::logout::run(),
     }
 }
 

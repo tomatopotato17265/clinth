@@ -28,6 +28,15 @@ pub fn save(record: &TokenRecord) -> Result<()> {
         .context("failed to write the credential to the OS keyring")
 }
 
+pub fn delete() -> Result<()> {
+    let entry =
+        Entry::new(KEYRING_SERVICE, KEYRING_ACCOUNT).context("failed to open the OS keyring")?;
+    match entry.delete_credential() {
+        Ok(()) | Err(keyring::Error::NoEntry) => Ok(()),
+        Err(e) => Err(e).context("failed to delete the credential from the OS keyring"),
+    }
+}
+
 pub fn load() -> Result<Option<TokenRecord>> {
     let entry = Entry::new(KEYRING_SERVICE, KEYRING_ACCOUNT).context("failed to open the OS keyring")?;
     match entry.get_password() {
