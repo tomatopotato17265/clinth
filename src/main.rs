@@ -2,6 +2,7 @@ mod auth;
 
 mod commands {
     pub mod login;
+    pub mod whoami;
 }
 
 use std::io::IsTerminal;
@@ -20,11 +21,14 @@ struct Cli {
 enum Commands {
     #[command(disable_help_flag = true)]
     Login,
+    #[command(disable_help_flag = true)]
+    Whoami,
 }
 
 fn main() -> Result<()> {
     match Cli::parse().command {
         Commands::Login => commands::login::run(),
+        Commands::Whoami => commands::whoami::run(),
     }
 }
 
