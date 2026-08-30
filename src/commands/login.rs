@@ -17,7 +17,7 @@ const SCOPES: &str = "USER_READ";
 const USER_AGENT: &str = concat!(
     "clinth/",
     env!("CARGO_PKG_VERSION"),
-    " (+https://github.com/tomatopotato/clinth)"
+    " (+https://github.com/tomatopotato17265/clinth)"
 );
 
 const KEYRING_SERVICE: &str = "clinth";
