@@ -1,5 +1,10 @@
 /target
 
+# IDE
+/.idea/
+/clinth.iml
+!.idea/icon.svg
+
 # Cloudflare Worker
 node_modules/
 .wrangler/
