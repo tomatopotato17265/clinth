@@ -2,15 +2,10 @@ use anyhow::{Context, Result, bail};
 use keyring::Entry;
 use serde::{Deserialize, Serialize};
 
+use crate::modrinth::{API_BASE, USER_AGENT};
+
 const KEYRING_SERVICE: &str = "clinth";
 const KEYRING_ACCOUNT: &str = "modrinth";
-const API_BASE: &str = "https://api.modrinth.com";
-
-const USER_AGENT: &str = concat!(
-    "clinth/",
-    env!("CARGO_PKG_VERSION"),
-    " (+https://github.com/tomatopotato17265/clinth)"
-);
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TokenRecord {

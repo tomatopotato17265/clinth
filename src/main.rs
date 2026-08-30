@@ -1,4 +1,5 @@
 mod auth;
+mod modrinth;
 
 mod commands {
     pub mod login;
