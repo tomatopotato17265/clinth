@@ -13,7 +13,7 @@ pub const USER_AGENT: &str = concat!(
 pub struct SearchHit {
     pub title: String,
     pub slug: String,
-    pub downloads: u64,
+    pub author: String,
     pub project_type: String,
 }
 
