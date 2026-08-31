@@ -14,7 +14,7 @@ pub enum ContentType {
 }
 
 impl ContentType {
-    fn facet(self) -> &'static str {
+    pub fn facet(self) -> &'static str {
         match self {
             ContentType::Mod => "mod",
             ContentType::Modpack => "modpack",

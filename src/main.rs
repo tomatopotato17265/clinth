@@ -3,6 +3,7 @@ mod modrinth;
 
 mod commands {
     pub mod discover;
+    pub mod install;
     pub mod login;
     pub mod logout;
     pub mod whoami;
@@ -36,6 +37,15 @@ enum Commands {
         content_type: commands::discover::ContentType,
         query: Vec<String>,
     },
+    #[command(
+        disable_help_flag = true,
+        override_usage = "clinth install <content-type> <query> [--<loader>] [--<mc-version>]"
+    )]
+    Install {
+        content_type: commands::discover::ContentType,
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        rest: Vec<String>,
+    },
 }
 
 fn main() -> Result<()> {
@@ -44,6 +54,7 @@ fn main() -> Result<()> {
         Commands::Whoami => commands::whoami::run(),
         Commands::Logout => commands::logout::run(),
         Commands::Discover { content_type, query } => commands::discover::run(content_type, &query),
+        Commands::Install { content_type, rest } => commands::install::run(content_type, &rest),
     }
 }
 
