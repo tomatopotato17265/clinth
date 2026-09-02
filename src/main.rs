@@ -1,7 +1,13 @@
 mod auth;
+mod collection;
 mod modrinth;
+mod organization;
+mod project;
+mod report;
+mod version;
 
 mod commands {
+    pub mod create;
     pub mod discover;
     pub mod install;
     pub mod login;
@@ -46,6 +52,13 @@ enum Commands {
         #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
         rest: Vec<String>,
     },
+    #[command(disable_help_flag = true)]
+    Create {
+        #[arg(long, global = true)]
+        dry_run: bool,
+        #[command(subcommand)]
+        command: commands::create::CreateCommand,
+    },
 }
 
 fn main() -> Result<()> {
@@ -55,6 +68,7 @@ fn main() -> Result<()> {
         Commands::Logout => commands::logout::run(),
         Commands::Discover { content_type, query } => commands::discover::run(content_type, &query),
         Commands::Install { content_type, rest } => commands::install::run(content_type, &rest),
+        Commands::Create { dry_run, command } => commands::create::run(command, dry_run),
     }
 }
 

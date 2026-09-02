@@ -2,7 +2,7 @@ use anyhow::{Context, Result, bail};
 use keyring::Entry;
 use serde::{Deserialize, Serialize};
 
-use crate::modrinth::{API_BASE, USER_AGENT};
+use crate::modrinth::{USER_AGENT, api};
 
 const KEYRING_SERVICE: &str = "clinth";
 const KEYRING_ACCOUNT: &str = "modrinth";
@@ -32,6 +32,13 @@ pub fn delete() -> Result<()> {
     }
 }
 
+pub fn token() -> Result<String> {
+    match load()? {
+        Some(record) => Ok(record.access_token),
+        None => bail!("not logged in \u{2014} run `clinth login`"),
+    }
+}
+
 pub fn load() -> Result<Option<TokenRecord>> {
     let entry = Entry::new(KEYRING_SERVICE, KEYRING_ACCOUNT).context("failed to open the OS keyring")?;
     match entry.get_password() {
@@ -50,7 +57,7 @@ struct User {
 
 pub fn fetch_username(access_token: &str) -> Result<String> {
     let resp = reqwest::blocking::Client::new()
-        .get(format!("{API_BASE}/v2/user"))
+        .get(format!("{}/user", api("v2")))
         .header("Authorization", access_token)
         .header("User-Agent", USER_AGENT)
         .send()
