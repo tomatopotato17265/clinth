@@ -3,7 +3,7 @@ use std::io::{self, BufRead, Write};
 use anyhow::Result;
 use clap::Subcommand;
 
-use crate::{collection, organization, project, report, version};
+use crate::{auth, collection, organization, project, report, version};
 
 #[derive(Debug, Subcommand)]
 pub enum CreateCommand {
@@ -20,12 +20,13 @@ pub enum CreateCommand {
 }
 
 pub fn run(command: CreateCommand, dry_run: bool) -> Result<()> {
+    let token = if dry_run { String::new() } else { auth::token()? };
     match command {
-        CreateCommand::Project => project::run(dry_run),
-        CreateCommand::Version => version::run(dry_run),
-        CreateCommand::Collection => collection::run(dry_run),
-        CreateCommand::Organization => organization::run(dry_run),
-        CreateCommand::Report => report::run(dry_run),
+        CreateCommand::Project => project::run(dry_run, &token),
+        CreateCommand::Version => version::run(dry_run, &token),
+        CreateCommand::Collection => collection::run(dry_run, &token),
+        CreateCommand::Organization => organization::run(dry_run, &token),
+        CreateCommand::Report => report::run(dry_run, &token),
     }
 }
 
