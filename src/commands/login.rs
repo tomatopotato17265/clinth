@@ -11,7 +11,7 @@ const WORKER_TOKEN_URL: &str = "https://clinth.tomatopotato17265.workers.dev/tok
 const REDIRECT_PORT: u16 = 7113;
 const REDIRECT_URI: &str = "http://localhost:7113/callback";
 const AUTHORIZE_URL: &str = "https://modrinth.com/auth/authorize";
-const SCOPES: &str = "USER_READ ORGANIZATION_CREATE";
+const SCOPES: &str = "USER_READ ORGANIZATION_CREATE COLLECTION_CREATE";
 
 pub fn run() -> Result<()> {
     let state = random_state()?;
